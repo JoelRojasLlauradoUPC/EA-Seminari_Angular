@@ -1,10 +1,16 @@
 <h2>Organizaciones</h2>
 
+<p> <input
+  type="text"
+  [formControl]="searchControl"
+  placeholder="Buscar por nombre..."
+/> </p>
+
 <p *ngIf="loading">Cargando...</p>
 <p *ngIf="!loading && errorMsg">{{ errorMsg }}</p>
 
 <ul class="list" *ngIf="!loading && !errorMsg && organizaciones.length > 0">
-  <li class="card" *ngFor="let org of organizaciones; trackBy: trackById">
+  <li class="card" *ngFor="let org of organizacionesFiltradas; trackBy: trackById">
 
     <div>
       <span class="name">{{ org.name }}</span>

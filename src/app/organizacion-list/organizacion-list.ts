@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../posts/api.service';
 import { Organizacion } from '../models/organizacion.model';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog';
 
@@ -16,6 +16,8 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog';
 })
 export class OrganizacionList implements OnInit {
   organizaciones: Organizacion[] = [];
+  organizacionesFiltradas: Organizacion[] = [];
+  searchControl = new FormControl('');
   loading = true;
   errorMsg = '';
   // Variable para controlar la visibilidad del formulario
@@ -28,11 +30,21 @@ organizacionEditId: string | null = null;
     this.organizacionForm = this.fb.group({
       nombre: ['', Validators.required],
     });
+
+    this.searchControl = new FormControl('');
   }
 
   //Función: leer
   ngOnInit(): void {
     this.load();
+
+    this.searchControl.valueChanges.subscribe(value => {
+      const term = value?.toLowerCase() ?? '';
+  
+      this.organizacionesFiltradas = this.organizaciones.filter(org =>
+        org.name.toLowerCase().includes(term)
+      );
+    });
   }
 
   load(): void {
@@ -43,6 +55,7 @@ organizacionEditId: string | null = null;
     this.api.getOrganizaciones().subscribe({
       next: (res) => {
         this.organizaciones = res?.organizaciones ?? [];
+        this.organizacionesFiltradas = [...this.organizaciones];
         this.loading = false;
         this.cdr.detectChanges();
       },

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ApiService } from '../posts/api.service';
 import { Usuario } from '../models/usuario.model';
 import { Organizacion } from '../models/organizacion.model';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormControl } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog';
 
@@ -17,6 +17,8 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog';
 export class UsuarioList implements OnInit {
   usuarios: Usuario[] = [];
   organizaciones: Organizacion[] = [];
+  usuariosFiltrados: Usuario[] = [];
+  searchControl = new FormControl('');
   loading = false;
   errorMsg = '';
   mostrarForm = false;
@@ -29,11 +31,22 @@ export class UsuarioList implements OnInit {
       name: ['', Validators.required],
       organizacion: ['', Validators.required],
     });
+
+    this.searchControl = new FormControl('');
+
   }
 
   ngOnInit(): void {
     this.load();
     this.loadOrganizaciones();
+    
+    this.searchControl.valueChanges.subscribe(value => {
+      const term = value?.toLowerCase() ?? '';
+  
+      this.usuariosFiltrados = this.usuarios.filter(org =>
+        org.name.toLowerCase().includes(term)
+      );
+    });
   }
 
   load(): void {
@@ -44,6 +57,7 @@ export class UsuarioList implements OnInit {
     this.api.getUsuarios().subscribe({
       next: (res) => {
         this.usuarios = res?.usuarios ?? [];
+        this.usuariosFiltrados = [...this.usuarios];
         this.loading = false;
         this.cdr.detectChanges();
       },
