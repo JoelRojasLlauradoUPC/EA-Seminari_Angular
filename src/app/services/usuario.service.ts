@@ -57,7 +57,7 @@ export class UsuarioService {
     );
   }
 
-  //Función: desasignar usuario de organización
+  //TASCA 3: desasignar usuari d'una organització
   removeOrganization(id: string): Observable<Usuario> {
     return this.http.put<Usuario>(
       `${this.baseUrl}/usuarios/removeOrganization/${id}`,
