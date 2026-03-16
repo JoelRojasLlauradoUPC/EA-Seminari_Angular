@@ -74,13 +74,35 @@
               <strong>{{ usuario.name }}</strong>
               <p class="muted">{{ usuario.email }}</p>
             </div>
-            <span class="muted">{{ usuario._id }}</span>
+            <div>
+              <span class="muted">{{ usuario._id }}</span>
+              <button type="button" class="btn btn-delete" (click)="desasignarUsuario(usuario._id, org._id)">
+                Borrar
+              </button>
+            </div>
           </div>
         } @empty {
           <p class="muted">No hay usuarios vinculados a esta organización.</p>
         }
+
+        <div class="assign-section">
+          <p><strong>Asignar usuario</strong></p>
+          <select [(ngModel)]="usuarioSeleccionado" style="width: 100%; padding: 5px; margin-bottom: 10px;">
+            <option value="">Selecciona un usuario</option>
+            @for (usuario of usuariosDisponibles; track usuario._id) {
+              <option [value]="usuario._id">{{ usuario.name }} ({{ usuario.email }})</option>
+            }
+          </select>
+          <button type="button" class="btn" (click)="asignarUsuario(usuarioSeleccionado, org._id)" [disabled]="!usuarioSeleccionado">
+            Añadir usuario
+          </button>
+        </div>
+
+        @if (syncErrorMsg) {
+          <p class="muted" style="color: red;">{{ syncErrorMsg }}</p>
+        }
       </div>
-    }
+    } <!-- x cada user mostrarem el detall TASCA 2-->
 
   </li>
 </ul>

@@ -43,10 +43,10 @@ export class UsuarioService {
   }
 
   //Función: actualizar usuario existente
-  updateUsuario(id: string, name: string, email: string, password: string, organizacion: string): Observable<Usuario> {
+  updateUsuario(id: string, name: string, email: string, password: string, organizacion: string | null): Observable<Usuario> {
     return this.http.put<Usuario>(
       `${this.baseUrl}/usuarios/${id}`,
-      { name, email, password, organizacion } 
+      { name, email, password, organizacion: organizacion || '' } 
     );
   }
 
@@ -54,6 +54,14 @@ export class UsuarioService {
   deleteUsuario(id: string): Observable<void> {
     return this.http.delete<void>(
       `${this.baseUrl}/usuarios/${id}`
+    );
+  }
+
+  //Función: desasignar usuario de organización
+  removeOrganization(id: string): Observable<Usuario> {
+    return this.http.put<Usuario>(
+      `${this.baseUrl}/usuarios/removeOrganization/${id}`,
+      {}
     );
   }
 }
