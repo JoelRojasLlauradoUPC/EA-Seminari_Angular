@@ -122,3 +122,12 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Materials Consultats
+- Els disponibles a Atenea.
+- Els publicats pel grup que ha realitzat la presentació.
+
+## Detall d'ús de la IA generativa
+S'ha utilitzat la IA per ajudar-me en el CSS en alguns moments. D'altre banda, també s'ha fet servir l'IA generativa per fer una revisió final de l'exercici un cop el codi ja funcionava per tal d'obtenir suggerències sobre aspectes de millora. No obstant, no s'han implementat accions de millora.
+
+## Vídeo amb la DEMO
