@@ -123,6 +123,12 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
 
+## TASCA 4
+- 1 GET x l'empresa
+- 1 GET x cada usuari ==> x 10 usuaris = 10 GETS
+=== TOTAL = 11 GETS ===
+
+
 ## Materials Consultats
 - Els disponibles a Atenea.
 - Els publicats pel grup que ha realitzat la presentació.
