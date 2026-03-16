@@ -128,7 +128,6 @@ For more information on using the Angular CLI, including detailed command refere
 - 1 GET x cada usuari ==> x 10 usuaris = 10 GETS
 === TOTAL = 11 GETS ===
 
-
 ## Materials Consultats
 - Els disponibles a Atenea.
 - Els publicats pel grup que ha realitzat la presentació.
@@ -137,3 +136,4 @@ For more information on using the Angular CLI, including detailed command refere
 S'ha utilitzat la IA per ajudar-me en el CSS en alguns moments. D'altre banda, també s'ha fet servir l'IA generativa per fer una revisió final de l'exercici un cop el codi ja funcionava per tal d'obtenir suggerències sobre aspectes de millora. No obstant, no s'han implementat accions de millora.
 
 ## Vídeo amb la DEMO
+https://youtu.be/r9coHuShhi0
