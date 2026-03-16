@@ -15,43 +15,72 @@
 <ul class="list" *ngIf="!loading && !errorMsg && organizaciones.length > 0">
   <!-- Lista de organizaciones -->
   <li class="card" *ngFor="let org of organizacionesVisibles; trackBy: trackById"> 
-    
-    <!-- Nombre con truncado si supera de 15 caracteres y botón para expandir -->
-    <div>
-      <span class="name">
-      {{
-        expanded[org._id] || org.name.length <= 15
-          ? org.name
-          : (org.name | slice:0:15) + '...'
-      }}
-      </span>
+    <div class="card-header">
+      <!-- Nombre con truncado si supera de 15 caracteres y botón para expandir -->
+      <div>
+        <span class="name">
+        {{
+          expanded[org._id] || org.name.length <= 15
+            ? org.name
+            : (org.name | slice:0:15) + '...'
+        }}
+        </span>
 
-      <!-- Botón para mostrar más o menos si el nombre es largo -->
-      <button *ngIf="org.name.length > 15"
-              class="btn"
-              (click)="toggleExpand(org._id)">
-        {{ expanded[org._id] ? 'Mostrar menos' : 'Mostrar más' }}
-      </button>
+        <!-- Botón para mostrar más o menos si el nombre es largo -->
+        <button *ngIf="org.name.length > 15"
+                class="btn"
+                (click)="toggleExpand(org._id)">
+          {{ expanded[org._id] ? 'Mostrar menos' : 'Mostrar más' }}
+        </button>
+      </div>
+
+      <!-- ID y botones de acción -->
+      <div>
+        <span class="muted">{{ org._id }}</span>
+
+        <button type="button"
+                class="btn"
+                (click)="toggleDetalle(org._id)">
+          {{ detalleVisible[org._id] ? 'Ocultar detalle' : 'Ver detalle' }}
+        </button>
+
+        <!-- BOTÓN EDITAR -->
+        <button type="button"
+                class="btn"
+                (click)="editar(org)">
+          Editar
+        </button>
+
+        <!-- BOTÓN ELIMINAR -->
+        <button type="button"
+                class="btn delete-btn"
+                (click)="confirmDelete(org._id, org.name)">
+          X
+        </button>
+      </div>
     </div>
 
-    <!-- ID y botones de acción -->
-    <div>
-      <span class="muted">{{ org._id }}</span>
+    @if (detalleVisible[org._id]) {
+      <div class="detail-panel">
+        <p><strong>Organización:</strong> {{ org.name }}</p>
+        <p><strong>ID:</strong> {{ org._id }}</p>
+        <p><strong>Total usuarios:</strong> {{ org.usuarios.length }}</p>
 
-      <!-- BOTÓN EDITAR -->
-      <button type="button"
-              class="btn"
-              (click)="editar(org)">
-        Editar
-      </button>
+        <h3>Usuarios vinculados</h3>
 
-      <!-- BOTÓN ELIMINAR -->
-      <button type="button"
-              class="btn delete-btn"
-              (click)="confirmDelete(org._id, org.name)">
-        X
-      </button>
-    </div>
+        @for (usuario of org.usuarios; track usuario._id) {
+          <div class="user-row">
+            <div>
+              <strong>{{ usuario.name }}</strong>
+              <p class="muted">{{ usuario.email }}</p>
+            </div>
+            <span class="muted">{{ usuario._id }}</span>
+          </div>
+        } @empty {
+          <p class="muted">No hay usuarios vinculados a esta organización.</p>
+        }
+      </div>
+    }
 
   </li>
 </ul>

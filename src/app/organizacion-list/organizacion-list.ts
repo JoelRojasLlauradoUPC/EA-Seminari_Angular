@@ -25,6 +25,7 @@ export class OrganizacionList implements OnInit {
   editando = false;
   organizacionEditId: string | null = null;
   expanded: { [key: string]: boolean } = {};
+  detalleVisible: { [key: string]: boolean } = {};
   limite = 10;
   mostrarTodasOrganizaciones = false;
   
@@ -143,6 +144,10 @@ export class OrganizacionList implements OnInit {
   //estado de expansión para mostrar el nombre completo
   toggleExpand(id: string): void {
     this.expanded[id] = !this.expanded[id];
+  }
+
+  toggleDetalle(id: string): void {
+    this.detalleVisible[id] = !this.detalleVisible[id];
   }
 
   //Función: resetear formulario
