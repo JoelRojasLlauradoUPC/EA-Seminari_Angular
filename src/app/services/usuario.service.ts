@@ -50,6 +50,14 @@ export class UsuarioService {
     );
   }
 
+  //Función: alternar rol admin de un usuario
+  toggleUsuarioAdmin(id: string): Observable<Usuario> {
+    return this.http.patch<Usuario>(
+      `${this.baseUrl}/usuarios/${id}/roles/admin`,
+      {}
+    );
+  }
+
   //Función: eliminar usuario
   deleteUsuario(id: string): Observable<void> {
     return this.http.delete<void>(

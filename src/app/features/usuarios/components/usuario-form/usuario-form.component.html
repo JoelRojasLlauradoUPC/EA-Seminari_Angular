@@ -1,0 +1,47 @@
+<div class="card">
+  <h3>{{ editando() ? 'Editar Usuario' : 'Nuevo Usuario' }}</h3>
+
+  <form [formGroup]="form()" (ngSubmit)="submit()">
+    <div style="margin-bottom: 10px;">
+      <label>Organizacion:</label>
+      <select formControlName="organizacion" style="width: 100%; padding: 5px;">
+        <option value="" disabled>Selecciona una organizacion</option>
+        <option *ngFor="let o of organizaciones()" [value]="o._id">{{ o.name }}</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom: 10px;">
+      <label>Nombre:</label>
+      <input type="text" formControlName="name" style="width: 100%; padding: 5px;" />
+    </div>
+
+    <div style="margin-bottom: 10px;">
+      <label>Email:</label>
+      <input type="email" formControlName="email" style="width: 100%; padding: 5px;" />
+      <small style="color: red;" *ngIf="form().get('email')?.hasError('email') && form().get('email')?.touched">
+        Formato de email invalido.
+      </small>
+    </div>
+
+    <div style="margin-bottom: 10px;">
+      <label>Contrasena:</label>
+      <input type="password" formControlName="password" style="width: 100%; padding: 5px;" />
+      <small style="color: red;" *ngIf="form().get('password')?.hasError('minlength') && form().get('password')?.touched">
+        La contrasena debe tener al menos 6 caracteres.
+      </small>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <label>Repetir contrasena:</label>
+      <input type="password" formControlName="confirmPassword" style="width: 100%; padding: 5px;" />
+      <small style="color: red;" *ngIf="form().hasError('passwordMismatch') && form().get('confirmPassword')?.touched">
+        Las contrasenas no coinciden.
+      </small>
+    </div>
+
+    <div>
+      <button type="submit" class="btn" [disabled]="form().invalid">Guardar</button>
+      <button type="button" class="btn" (click)="onCancel()" style="margin-left: 10px;">Cancelar</button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,53 @@
+<h2>Usuarios</h2>
+
+<p>
+  <input type="text" [formControl]="searchControl" placeholder="Buscar por nombre..." />
+</p>
+
+<p *ngIf="loading">Cargando...</p>
+<p *ngIf="!loading && errorMsg">{{ errorMsg }}</p>
+<p *ngIf="!loading && permisosMsg">{{ permisosMsg }}</p>
+
+<p *ngIf="!loading && !errorMsg && usuarios.length === 0">No hay usuarios.</p>
+
+<button
+  *ngIf="!mostrarForm && !soloMiUsuario"
+  type="button"
+  class="btn"
+  (click)="mostrarFormulario()"
+  style="margin-bottom: 15px;"
+>
+  Anadir Nuevo Usuario
+</button>
+
+<app-usuario-form
+  *ngIf="mostrarForm"
+  [form]="usuarioForm"
+  [organizaciones]="organizaciones"
+  [editando]="editando"
+  (save)="guardar()"
+  (cancel)="resetForm()"
+></app-usuario-form>
+
+<div *ngIf="!loading && usuariosVisibles.length > 0">
+  <app-usuario-table
+    [usuarios]="usuariosVisibles"
+    [isAdmin]="esAdmin()"
+    [currentUserId]="currentUserId"
+    (edit)="editar($event)"
+    (delete)="confirmDelete($event)"
+    (adminToggle)="toggleAdmin($event)"
+  ></app-usuario-table>
+</div>
+
+<div style="margin-top: 10px;">
+  <button *ngIf="!mostrarTodosUsuarios && usuariosFiltrados.length > limite" class="btn" (click)="mostrarMas()">
+    Mostrar mas
+  </button>
+
+  <button *ngIf="mostrarTodosUsuarios" class="btn" (click)="mostrarTodosUsuarios = false" style="margin-left: 10px;">
+    Mostrar menos
+  </button>
+</div>
+
+<button type="button" class="btn" (click)="loadUsuarios()" style="margin-top: 15px;">Recargar</button>

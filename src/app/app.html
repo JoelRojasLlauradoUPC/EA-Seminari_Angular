@@ -4,17 +4,26 @@
   </div>
 
   <nav class="nav">
+    <a routerLink="/login" routerLinkActive="active" *ngIf="!isAuthenticated()">
+      Login
+    </a>
+
     <a
-      routerLink="/"
+      routerLink="/home"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
+      *ngIf="isAuthenticated()"
     >
       Organizaciones
     </a>
 
-    <a routerLink="/usuarios" routerLinkActive="active">
+    <a routerLink="/usuarios" routerLinkActive="active" *ngIf="isAuthenticated()">
       Usuarios
     </a>
+
+    <button type="button" class="nav-btn" *ngIf="isAuthenticated()" (click)="logout()">
+      Logout
+    </button>
   </nav>
 </header>
 
