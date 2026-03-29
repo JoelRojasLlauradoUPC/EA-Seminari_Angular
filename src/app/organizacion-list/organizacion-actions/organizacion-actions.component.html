@@ -1,0 +1,52 @@
+<ng-container *ngIf="isAdmin()">
+  <!-- Primera div: Nombre con botón expandir -->
+  <div>
+    <span class="name">
+      {{
+        expanded()
+          ? organizacion().name
+          : (organizacion().name.length > 15
+              ? (organizacion().name | slice:0:15) + '...'
+              : organizacion().name)
+      }}
+    </span>
+
+    <!-- Botón para expandir/contraer si el nombre es largo -->
+    <button *ngIf="organizacion().name.length > 15"
+            class="btn"
+            (click)="onToggleExpand()">
+      {{ expanded() ? 'Mostrar menos' : 'Mostrar más' }}
+    </button>
+  </div>
+
+  <!-- Segunda div: ID y botones de acción -->
+  <div>
+    <span class="muted">{{ organizacion()._id }}</span>
+
+    <!-- Botón Ver Detalle -->
+    <button type="button"
+            class="btn"
+            (click)="onToggleDetail()">
+      Ver detalle
+    </button>
+
+    <!-- Botón Editar -->
+    <button type="button"
+            class="btn"
+            (click)="onEdit()">
+      Editar
+    </button>
+
+    <!-- Botón Eliminar -->
+    <button type="button"
+            class="btn delete-btn"
+            (click)="onDelete()">
+      X
+    </button>
+  </div>
+</ng-container>
+
+<!-- Si no es admin: solo mostrar el nombre -->
+<ng-container *ngIf="!isAdmin()">
+  <span class="name">{{ organizacion().name }}</span>
+</ng-container>

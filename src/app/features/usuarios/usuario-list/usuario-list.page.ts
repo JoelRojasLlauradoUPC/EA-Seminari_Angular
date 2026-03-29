@@ -149,7 +149,18 @@ export class UsuarioListPageComponent implements OnInit {
   loadOrganizaciones(): void {
     this.api.getOrganizaciones().subscribe({
       next: (res) => {
-        this.organizaciones = res;
+        // Si no es admin, solo mostrar la organizacion del usuario actual
+        if (!this.auth.hasRole('admin')) {
+          const currentUser = this.auth.getCurrentUser();
+          if (currentUser && currentUser.organizacion) {
+            const orgId = typeof currentUser.organizacion === 'string' ? currentUser.organizacion : (currentUser.organizacion as Organizacion)?._id;
+            this.organizaciones = res.filter(org => org._id === orgId);
+          } else {
+            this.organizaciones = [];
+          }
+        } else {
+          this.organizaciones = res;
+        }
       },
       error: (err) => {
         console.error(err);
@@ -166,6 +177,10 @@ export class UsuarioListPageComponent implements OnInit {
   }
 
   mostrarFormulario(): void {
+    this.errorMsg = '';
+    this.editando = false;
+    this.usuarioEditId = null;
+    this.usuarioForm.reset();
     this.mostrarForm = true;
   }
 
@@ -185,21 +200,25 @@ export class UsuarioListPageComponent implements OnInit {
       return;
     }
 
+    this.loading = true;
     const { name, email, password, organizacion } = this.usuarioForm.value;
 
     if (this.editando && this.usuarioEditId) {
       if (!this.puedeModificar(this.usuarioEditId)) {
         this.errorMsg = 'no tienes permisos para ver ni modificar otros usuarios';
+        this.loading = false;
         return;
       }
 
       this.api.updateUsuario(this.usuarioEditId, name, email, password, organizacion).subscribe({
         next: () => {
+          this.loading = false;
           this.resetForm();
           this.loadUsuarios();
         },
         error: (err) => {
           console.error(err);
+          this.loading = false;
           this.errorMsg = 'No se ha podido actualizar el usuario.';
         },
       });
@@ -208,16 +227,19 @@ export class UsuarioListPageComponent implements OnInit {
 
     if (this.soloMiUsuario && !this.esAdmin()) {
       this.errorMsg = 'no tienes permisos para ver ni modificar otros usuarios';
+      this.loading = false;
       return;
     }
 
     this.api.createUsuario(name, email, password, organizacion).subscribe({
       next: () => {
+        this.loading = false;
         this.resetForm();
         this.loadUsuarios();
       },
       error: (err) => {
         console.error(err);
+        this.loading = false;
         this.errorMsg = err?.error?.message ?? 'No se ha podido crear el usuario.';
       },
     });

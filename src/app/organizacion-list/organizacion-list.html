@@ -16,48 +16,16 @@
   <!-- Lista de organizaciones -->
   <li class="card" *ngFor="let org of organizacionesVisibles; trackBy: trackById"> 
     <div class="card-header">
-      <!-- Nombre con truncado si supera de 15 caracteres y botón para expandir -->
-      <div>
-        <span class="name">
-        {{
-          expanded[org._id] || org.name.length <= 15
-            ? org.name
-            : (org.name | slice:0:15) + '...'
-        }}
-        </span>
-
-        <!-- Botón para mostrar más o menos si el nombre es largo -->
-        <button *ngIf="org.name.length > 15"
-                class="btn"
-                (click)="toggleExpand(org._id)">
-          {{ expanded[org._id] ? 'Mostrar menos' : 'Mostrar más' }}
-        </button>
-      </div>
-
-      <!-- ID y botones de acción -->
-      <div>
-        <span class="muted">{{ org._id }}</span>
-
-        <button type="button"
-                class="btn"
-                (click)="toggleDetalle(org._id)">
-          {{ detalleVisible[org._id] ? 'Ocultar detalle' : 'Ver detalle' }}
-        </button>
-
-        <!-- BOTÓN EDITAR -->
-        <button type="button"
-                class="btn"
-                (click)="editar(org)">
-          Editar
-        </button>
-
-        <!-- BOTÓN ELIMINAR -->
-        <button type="button"
-                class="btn delete-btn"
-                (click)="confirmDelete(org._id, org.name)">
-          X
-        </button>
-      </div>
+      <!-- Componente de acciones -->
+      <app-organizacion-actions
+        [organizacion]="org"
+        [isAdmin]="isAdmin()"
+        [expanded]="expanded[org._id] || false"
+        (toggleExpand)="toggleExpand(org._id)"
+        (toggleDetail)="toggleDetalle(org._id)"
+        (edit)="editar(org)"
+        (delete)="confirmDelete(org._id, org.name)">
+      </app-organizacion-actions>
     </div>
 
     <!-- TASCA 2: detall i usuaris de cada organització -->
@@ -65,11 +33,11 @@
       <div class="detail-panel">
         <p><strong>Organización:</strong> {{ org.name }}</p>
         <p><strong>ID:</strong> {{ org._id }}</p>
-        <p><strong>Total usuarios:</strong> {{ org.usuarios.length }}</p>
+        <p><strong>Total usuarios:</strong> {{ getTotalUsuarios(org) }}</p>
 
         <h3>Usuarios vinculados</h3>
 
-        @for (usuario of org.usuarios; track usuario._id) {
+        @for (usuario of getUsuariosDeOrg(org); track usuario._id) {
           <div class="user-row">
             <div>
               <strong>{{ usuario.name }}</strong>
@@ -77,8 +45,8 @@
             </div>
             <div>
               <span class="muted">{{ usuario._id }}</span>
-              <button type="button" class="btn btn-delete" (click)="desasignarUsuario(usuario._id, org._id)">
-                Borrar
+              <button type="button" class="btn btn-delete" (click)="desasignarUsuario(usuario._id)">
+                Eliminar de Organización
               </button>
             </div>
           </div>
@@ -90,7 +58,7 @@
           <p><strong>Asignar usuario</strong></p>
           <select [(ngModel)]="usuarioSeleccionado" style="width: 100%; padding: 5px; margin-bottom: 10px;">
             <option value="">Selecciona un usuario</option>
-            @for (usuario of usuariosDisponibles; track usuario._id) {
+            @for (usuario of getUsuariosDisponiblesParaOrg(org._id); track usuario._id) {
               <option [value]="usuario._id">{{ usuario.name }} ({{ usuario.email }})</option>
             }
           </select>
@@ -129,11 +97,11 @@
 </p>
 
 <!-- Formulario para añadir/editar organización -->
-<button type="button" class="btn" (click)="mostrarFormulario()">
+<button type="button" class="btn" (click)="mostrarFormulario()" *ngIf="isAdmin()">
   Añadir
 </button>
 
-<div *ngIf="mostrarForm" class="card">
+<div *ngIf="mostrarForm && isAdmin()" class="card">
 
   <h3>{{ editando ? 'Editar Organización' : 'Nueva Organización' }}</h3>
 

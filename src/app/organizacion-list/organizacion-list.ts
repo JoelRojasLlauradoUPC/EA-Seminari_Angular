@@ -2,18 +2,20 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrganizacionService } from '../services/organizacion.service';
 import { UsuarioService } from '../services/usuario.service';
+import { AuthService } from '../core/auth/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Organizacion } from '../models/organizacion.model';
 import { Usuario } from '../models/usuario.model';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl, FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog';
+import { OrganizacionActionsComponent } from './organizacion-actions/organizacion-actions.component';
 
 
 @Component({
   selector: 'app-organizacion-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatDialogModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, MatDialogModule, FormsModule, OrganizacionActionsComponent],
   templateUrl: './organizacion-list.html',
   styleUrls: ['./organizacion-list.css'],
 })
@@ -35,7 +37,7 @@ export class OrganizacionList implements OnInit {
   limite = 10;
   mostrarTodasOrganizaciones = false;
   
-  constructor(private api: OrganizacionService, private usuarioApi: UsuarioService, private fb: FormBuilder, private cdr: ChangeDetectorRef, private dialog: MatDialog) {
+  constructor(private api: OrganizacionService, private usuarioApi: UsuarioService, private fb: FormBuilder, private cdr: ChangeDetectorRef, private dialog: MatDialog, private auth: AuthService) {
     this.organizacionForm = this.fb.group({
       nombre: ['', Validators.required],
     });
@@ -59,11 +61,70 @@ export class OrganizacionList implements OnInit {
     this.usuarioApi.getUsuarios().subscribe({
       next: (res) => {
         this.usuariosDisponibles = res;
+        this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
+        console.error('Error cargando usuarios:', err);
         this.syncErrorMsg = 'No se han podido cargar los usuarios.';
+        this.cdr.detectChanges();
       }
     });
+  }
+
+  // Normaliza posibles formas de respuesta del backend: usuarios, users o sin usuarios.
+  private normalizeOrganizaciones(res: Organizacion[]): Organizacion[] {
+    return res.map((org) => {
+      const anyOrg = org as unknown as { users?: unknown[]; usuarios?: unknown[] };
+      const usuarios = Array.isArray(anyOrg.usuarios)
+        ? anyOrg.usuarios
+        : Array.isArray(anyOrg.users)
+          ? anyOrg.users
+          : [];
+
+      return {
+        ...org,
+        usuarios: usuarios as Usuario[],
+      };
+    });
+  }
+
+  private getUsuarioOrganizacionId(usuario: Usuario): string | null {
+    const org = usuario.organizacion;
+    if (!org) {
+      return null;
+    }
+
+    if (typeof org === 'string') {
+      return org;
+    }
+
+    return org._id ?? null;
+  }
+
+  getUsuariosDeOrg(org: Organizacion): Usuario[] {
+    const usuariosEnOrg = Array.isArray(org.usuarios) ? org.usuarios : [];
+
+    // Si el backend no hidrata org.usuarios, hacemos fallback con GET /usuarios.
+    if (usuariosEnOrg.length > 0) {
+      return usuariosEnOrg;
+    }
+
+    return this.usuariosDisponibles.filter(
+      (usuario) => this.getUsuarioOrganizacionId(usuario) === org._id
+    );
+  }
+
+  getTotalUsuarios(org: Organizacion): number {
+    return this.getUsuariosDeOrg(org).length;
+  }
+
+  //Función: obtener usuarios disponibles para una organización (no asignados)
+  getUsuariosDisponiblesParaOrg(orgId: string): Usuario[] {
+    const org = this.organizaciones.find(o => o._id === orgId);
+    if (!org) return this.usuariosDisponibles;
+    
+    const usuariosAsignados = this.getUsuariosDeOrg(org).map(u => u._id);
+    return this.usuariosDisponibles.filter(u => !usuariosAsignados.includes(u._id));
   }
 
   load(): void {
@@ -73,7 +134,7 @@ export class OrganizacionList implements OnInit {
 
     this.api.getOrganizaciones().subscribe({
       next: (res) => {
-        this.organizaciones = res;
+        this.organizaciones = this.normalizeOrganizaciones(res);
         this.organizacionesFiltradas = [...this.organizaciones];
         this.loading = false;
         this.cdr.detectChanges();
@@ -174,7 +235,7 @@ export class OrganizacionList implements OnInit {
     });
   }
 
-  desasignarUsuario(usuarioId: string, organizacionId: string): void {
+  desasignarUsuario(usuarioId: string): void {
     this.syncErrorMsg = '';
     this.usuarioApi.removeOrganization(usuarioId).subscribe({
       next: () => {
@@ -183,7 +244,11 @@ export class OrganizacionList implements OnInit {
       },
       error: (err: HttpErrorResponse) => {
         const backendMsg = err?.error?.message || err?.message || 'Error desconocido';
-        this.syncErrorMsg = `No se ha podido desasignar el usuario. (${err.status}) ${backendMsg}`;
+        if (err.status === 404) {
+          this.syncErrorMsg = `No se ha podido desasignar el usuario. (404) Usuario no encontrado en el backend actual.`;
+        } else {
+          this.syncErrorMsg = `No se ha podido desasignar el usuario. (${err.status}) ${backendMsg}`;
+        }
         this.cdr.markForCheck();
       }
     });
@@ -250,5 +315,10 @@ export class OrganizacionList implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  //Función: verificar si el usuario es admin
+  isAdmin(): boolean {
+    return this.auth.hasRole('admin');
   }
 }

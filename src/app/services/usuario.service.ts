@@ -69,7 +69,7 @@ export class UsuarioService {
   removeOrganization(id: string): Observable<Usuario> {
     return this.http.put<Usuario>(
       `${this.baseUrl}/usuarios/removeOrganization/${id}`,
-      {}
+      null
     );
   }
 }
