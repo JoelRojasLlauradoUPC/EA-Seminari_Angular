@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Organizacion } from '../../models/organizacion.model';
+import { Organizacion } from '../../../../models/organizacion.model';
 
 @Component({
   selector: 'app-organizacion-actions',

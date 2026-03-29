@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { OrganizacionList } from './organizacion-list/organizacion-list';
+import { OrganizacionList } from './features/organizaciones/organizacion-list/organizacion-list';
 import { UsuarioListPageComponent } from './features/usuarios/usuario-list/usuario-list.page';
 import { LoginComponent } from './features/auth/login/login.component';
 import { authGuard } from './core/auth/auth.guard';

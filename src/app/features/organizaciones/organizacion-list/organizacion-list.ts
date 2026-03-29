@@ -1,14 +1,14 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { OrganizacionService } from '../services/organizacion.service';
-import { UsuarioService } from '../services/usuario.service';
-import { AuthService } from '../core/auth/auth.service';
+import { OrganizacionService } from '../../../services/organizacion.service';
+import { UsuarioService } from '../../../services/usuario.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Organizacion } from '../models/organizacion.model';
-import { Usuario } from '../models/usuario.model';
+import { Organizacion } from '../../../models/organizacion.model';
+import { Usuario } from '../../../models/usuario.model';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl, FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog';
+import { ConfirmDialogComponent } from '../../../confirm-dialog/confirm-dialog';
 import { OrganizacionActionsComponent } from './organizacion-actions/organizacion-actions.component';
 
 
